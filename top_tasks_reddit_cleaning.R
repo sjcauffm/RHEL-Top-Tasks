@@ -9,3 +9,4 @@ import <- gs_title("rhel_top_tasks_reddit")
 raw_data <- gs_read_csv(import)
 
 #### Adapting code from previous script. Survey structure is slightly different from previous surveys
+data <- raw_data[3:47,]
