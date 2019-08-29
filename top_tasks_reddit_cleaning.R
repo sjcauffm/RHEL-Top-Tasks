@@ -26,20 +26,43 @@ top_tasks_by_section <- function (area){
   area <- gather(area_data, type, value, -response_id)
 }
 
-top_tasks_by_section_split <- function (area){
-  tasks <- data.frame(response_id = 0, type = 0, value = 0)
-  ranks <- data.frame(response_id = 0, type = 0, value = 0)
-  temp <- grep("TEXT", area$type)
-  ranks <- rbind(ranks, area[temp,])
-  ranks <- ranks[complete.cases(ranks$value),]
-  tasks <- rbind(tasks, area[-temp,])
-  tasks <- tasks[complete.cases(tasks$value),]
-  combine <- cbind(tasks, ranks)
-  combine <- combine[which(combine$type != 0), ]
-  combine <- combine[, c(1:3,6)]
-}
+pick5 <- grep("pick5", clean$type)
+rank5 <- grep("rank5", clean$type)
 
-unclean <- lapply(area_names, top_tasks_by_section)
-clean <- do.call(rbind.data.frame, unclean)
-names(clean) <- c("response_id", "question", "pick5", "rank5")
+picks <- clean[pick5,]
+picks2 <- x[complete.cases(x$value),]
+ranks <- clean[rank5,]
+ranks2 <- y[complete.cases(y$value),] 
+
+temp <- picks2$response_id %in% ranks2$response_id
+picks2$complete <- temp
+
+picks2 <- picks2[which(picks2$complete == TRUE),]
+temp2 <- y2$response_id %in% x2$response_id
+
+x <- strsplit(picks2$type, "_pick5_")
+x <- do.call(rbind.data.frame, x)
+names(x) <- c("area", "num")
+picks2$question_id <- paste0(x$area,sep = "_", x$num)
+
+y <- strsplit(ranks2$type, "_rank5_")
+y <- do.call(rbind.data.frame, y)
+names(y) <- c("area", "num")
+ranks2$question_id <- paste0(y$area, sep = "_", y$num)
+
+bleh <- picks2$question_id %in% ranks2$question_id
+picks2$bleh <- bleh
+
+picks2 <- picks2[which(picks2$bleh == TRUE),]
+
+picks2 <- picks2[,c(1:3, 5)]
+
+combined <- full_join(picks2, ranks2, by = c("response_id", "question_id"))
+names(combined) <- 
+
+
+
+
+
+
 clean_data <- clean
