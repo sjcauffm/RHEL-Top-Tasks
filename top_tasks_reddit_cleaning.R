@@ -14,14 +14,15 @@ data_trim <- data[,c(9, 18:484)]
 
 names(data_trim)[1] <- c("response_id")
 
-diff <- 
+diff <- grep("difficulty", names(data_trim))
+data_trim2 <- data_trim[,-diff]
 
 area_names <- c("security_", "storage_", "network_", "virtual_", "identity_", 
                 "entitle_","sysm_", "errata_pick", "migrate_")
 
 top_tasks_by_section <- function (area){
-  area_grep <- grep(area, names(data_trim))
-  area_data <- data_trim[,c(1, area_grep)]
+  area_grep <- grep(area, names(data_trim2))
+  area_data <- data_trim2[,c(1, area_grep)]
   area <- gather(area_data, type, value, -response_id)
 }
 
