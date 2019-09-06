@@ -26,13 +26,16 @@ top_tasks_by_section <- function (area){
   area <- gather(area_data, type, value, -response_id)
 }
 
+clean <- lapply(area_names, top_tasks_by_section)
+clean <- do.call(rbind.data.frame, clean)
+
 pick5 <- grep("pick5", clean$type)
 rank5 <- grep("rank5", clean$type)
 
 picks <- clean[pick5,]
-picks2 <- x[complete.cases(x$value),]
+picks2 <- picks[complete.cases(picks$value),]
 ranks <- clean[rank5,]
-ranks2 <- y[complete.cases(y$value),] 
+ranks2 <- ranks[complete.cases(ranks$value),] 
 
 temp <- picks2$response_id %in% ranks2$response_id
 picks2$complete <- temp
@@ -58,11 +61,14 @@ picks2 <- picks2[which(picks2$bleh == TRUE),]
 picks2 <- picks2[,c(1:3, 5)]
 
 combined <- full_join(picks2, ranks2, by = c("response_id", "question_id"))
-names(combined) <- 
+combined <- combined[,c(1,3:4, 6)]
 
+ugh <- strsplit(combined$question_id, "_")
+ugh <- do.call(rbind.data.frame, ugh)
+names(ugh) <- c("area", "num")
 
+combined$area <- ugh$area
+names(combined) <- c("response_id", "pick5", "question_id", "rank5", "area")
+combined <- combined[,c("response_id", "area", "pick5", "rank5")]
 
-
-
-
-clean_data <- clean
+write.csv(combined, file = "reddit_top_tasks.csv")
